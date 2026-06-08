@@ -1,11 +1,7 @@
-# CONTEXT v2.2 — BillGameCore
+# CONTEXT v2.2 — Tung
 
-**Tài liệu kiến trúc bắt buộc cho dự án BillGameCore.**
+**Tài liệu kiến trúc bắt buộc cho dự án Tung.**
 Mọi AI hoặc người sửa code phải đọc và tuân thủ tài liệu này trước khi thay đổi script.
-
-**Tài liệu phụ trợ cho AI:**
-- AI hội thoại/tư vấn đọc thêm `Assets/Editor/AI_CONVERSATION_GUIDE.md`.
-- AI/agent sửa code theo module đọc thêm `Assets/Editor/AI_MODULE_WORKFLOW.md`.
 
 **Nguyên tắc vận hành:** không tự suy diễn pattern, không đổi convention ngầm, không thêm abstraction khi chưa có nhu cầu thật. Nếu code hiện tại và tài liệu này mâu thuẫn, phải dừng lại, báo rõ file/line liên quan và hỏi người sở hữu dự án trước khi sửa.
 
@@ -13,7 +9,7 @@ Mọi AI hoặc người sửa code phải đọc và tuân thủ tài liệu n�
 
 ## 1. Trạng thái chuẩn hiện tại
 
-**Project:** BillGameCore — Unity `6000.4.6f1`, 2D game, VContainer, New Input System. MessagePipe đã có package nhưng chưa phải backbone hiện tại.
+**Project:** Tung — Unity `6000.4.10f1`, 2D game, VContainer, New Input System. MessagePipe đã có package nhưng chưa phải backbone hiện tại.
 
 **Cách học/thực hành hiện tại:** vẫn giữ khung kiến trúc đầy đủ A-Z bên dưới, nhưng triển khai theo vertical slice để hiểu rõ từng luồng chạy trước khi mở rộng số lượng tính năng. Không hạ cấp kiến trúc thành MVP sơ sài và không xóa định hướng Player/Inventory/Enemy/Scenes khỏi khung.
 
@@ -54,15 +50,15 @@ Mọi AI hoặc người sửa code phải đọc và tuân thủ tài liệu n�
 Chiều phụ thuộc hợp lệ:
 
 ```text
-BillGameCore.Core
-  <- BillGameCore.SharedPorts
-      <- BillGameCore.Modules.Input
-      <- BillGameCore.Modules.Player
-      <- BillGameCore.Modules.Inventory
-      <- BillGameCore.Modules.InteractionGroup
-      <- BillGameCore.Modules.Enemy
-      <- BillGameCore.Composition          (chỉ cho project-scope services)
-      <- BillGameCore.Scenes               (scene orchestration)
+01_Core
+  <- 02_SharedPorts
+      <- 03_Modules.Input
+      <- 03_Modules.Player
+      <- 03_Modules.Inventory
+      <- 03_Modules.InteractionGroup
+      <- 03_Modules.Enemy
+      <- 04_Composition          (chỉ cho project-scope services)
+      <- 05_Scenes               (scene orchestration)
 ```
 
 Reference hiện tại:
@@ -120,7 +116,7 @@ Assets/_Game/
 │   └── 00_Bootstrap.unity
 └── Scripts/
     ├── 01_Core/
-    │   ├── BillGameCore.Core.asmdef
+    │   ├── Tung.Core.asmdef
     │   ├── Combat/
     │   ├── Interaction/
     │   ├── Inventory/
@@ -129,7 +125,7 @@ Assets/_Game/
     │   └── ValueObjects/
     │
     ├── 02_SharedPorts/
-    │   ├── BillGameCore.SharedPorts.asmdef
+    │   ├── Tung.SharedPorts.asmdef
     │   ├── Combat/
     │   ├── Economy/
     │   ├── Input/
@@ -145,11 +141,11 @@ Assets/_Game/
     │   └── Enemy/
     │
     ├── 04_Composition/
-    │   ├── BillGameCore.Composition.asmdef
+    │   ├── Tung.Composition.asmdef
     │   └── ProjectLifetimeScope.cs
     │
     └── 05_Scenes/
-        ├── BillGameCore.Scenes.asmdef
+        ├── Tung.Scenes.asmdef
         ├── BootstrapSceneLifetimeScope.cs
         ├── WalletReadSource.cs
         ├── WalletHudView.cs
@@ -167,7 +163,7 @@ Assets/_Game/
 
 ## 5. Core — Shared Kernel
 
-Core là BCL-only. `BillGameCore.Core.asmdef` phải luôn có:
+Core là BCL-only. `Tung.Core.asmdef` phải luôn có:
 
 ```json
 "noEngineReferences": true
@@ -176,7 +172,7 @@ Core là BCL-only. `BillGameCore.Core.asmdef` phải luôn có:
 Core hiện gồm:
 
 ```text
-Core/ValueObjects/BillEntityId.cs
+Core/ValueObjects/TungEntityId.cs
 Core/Combat/DamageInfo.cs
 Core/Combat/DamageResult.cs
 Core/Combat/IDamageReceiver.cs
@@ -188,11 +184,11 @@ Core/Rewards/RewardBundle.cs
 `Core/Save/` hiện mới là placeholder folder; các save snapshot interfaces chưa materialize trong baseline hiện tại.
 
 Quy tắc Core:
-- `BillEntityId.New()` chỉ gọi trong spawner/binder nơi entity instance được tạo.
-- `BillEntityId` dùng `Guid`, có `Invalid`, `IsValid`, constructor private, và `ToString()` rút gọn để log/debug dễ đọc.
+- `TungEntityId.New()` chỉ gọi trong spawner/binder nơi entity instance được tạo.
+- `TungEntityId` dùng `Guid`, có `Invalid`, `IsValid`, constructor private, và `ToString()` rút gọn để log/debug dễ đọc.
 - `IDamageReceiver.ReceiveDamage()` là contract combat duy nhất cho nhận damage.
 - `ReceiveDamage()` implementations phải clamp damage âm về `0` trước khi trừ máu. Heal/buff không đi qua `DamageInfo`.
-- `DamageInfo` baseline dùng `float Amount`, `BillEntityId SourceId`, `bool IsCritical`.
+- `DamageInfo` baseline dùng `float Amount`, `TungEntityId SourceId`, `bool IsCritical`.
 - `DamageResult` baseline dùng `float AppliedDamage`, `float RemainingHealth`, `bool JustDied`.
 - `IInteractable` được implement bởi binder/presentation object, không bởi Application.
 - `RewardBundle` là DTO reward dùng bởi enemy/death/reward flow.
@@ -224,7 +220,7 @@ Quy tắc:
 - Concrete commands nằm trong `Modules/Input/Commands`.
 - Concrete commands implement interfaces từ `SharedPorts/Input`.
 - Consumer ngoài module Input chỉ dùng `ICommand`, `IMoveCommand`, `IAttackCommand`, `IInteractCommand`, `CommandType`.
-- `ICommand` dùng `BillEntityId ControlledEntityId`, không dùng `TargetId` hoặc `SourceId` cho input command.
+- `ICommand` dùng `TungEntityId ControlledEntityId`, không dùng `TargetId` hoặc `SourceId` cho input command.
 - `CommandType` phải có `None = 0`, sau đó `Move = 1`, `Attack = 2`, `Interact = 3`, `SwitchContext = 4`. Không đánh số lại sau khi đã có replay/save.
 - `IMoveCommand` expose `DirX`, `DirY`, `IsMoving`.
 - `IAttackCommand` expose `IsHeld`, `HeldDuration`.
@@ -431,7 +427,7 @@ Không được:
 Asmdef:
 
 ```text
-BillGameCore.Modules.Input
+Tung.Modules.Input
 refs: Core, SharedPorts, VContainer, Unity.InputSystem
 ```
 
@@ -458,7 +454,7 @@ Rules:
 - `InputContextNames` là nơi duy nhất trong module Input gom tên action map: `Player`, `UI`, `Vehicle`.
 - `InputReader` là MonoBehaviour, giữ serialized `InputActionAsset`, dùng `InputActionGateway` để đọc New Input System và dịch raw input thành command object. `InputReader` implement `IInputContextService`.
 - `InputReader` nhận `CommandBuffer` qua `[Inject]`.
-- `InputReader.SetControlledEntity(BillEntityId)` phải validate `BillEntityId.IsValid`.
+- `InputReader.SetControlledEntity(TungEntityId)` phải validate `TungEntityId.IsValid`.
 - `InputReader.ReadPlayerMap()` enqueue `MoveCommand` mỗi frame, kể cả khi không di chuyển, để consumer có thể set velocity về `0`.
 - `InputReader.SwitchContext(...)` phải disable map cũ, set context mới, enable map mới, rồi clear command buffer.
 - `InputReader.WasSubmitPressedThisFrame()` chỉ đọc được khi context hiện tại là `UI` và được dùng cho death/restart flow.
@@ -488,7 +484,7 @@ PlayerPresenter
 Asmdef:
 
 ```text
-BillGameCore.Modules.Player
+Tung.Modules.Player
 refs: Core, SharedPorts, VContainer
 ```
 
@@ -528,7 +524,7 @@ Domain không dùng UnityEngine.
 - implement `IDamageReceiver`.
 - không dùng UnityEngine.
 - không biết world position.
-- `OnDied` chỉ emit `BillEntityId` và `RewardBundle`.
+- `OnDied` chỉ emit `TungEntityId` và `RewardBundle`.
 
 ### Presentation
 
@@ -542,7 +538,7 @@ Domain không dùng UnityEngine.
 - đọc input qua `IInputCommandSource`.
 - không biết concrete command classes.
 - lấy world position từ `PlayerView.WorldPosition` khi player chết.
-- gọi `OnDiedCallback(BillEntityId, RewardBundle, Vector2)` cho scene layer.
+- gọi `OnDiedCallback(TungEntityId, RewardBundle, Vector2)` cho scene layer.
 - nhận `InteractCommand` thì interact với target hiện tại từ `PlayerInteractSensor.CurrentTarget`.
 - forward damage xuống `PlayerApplication.ReceiveDamage(...)`.
 
@@ -552,7 +548,7 @@ Domain không dùng UnityEngine.
 
 `PlayerSpawner`:
 - có đúng 1 public constructor để VContainer resolve rõ ràng.
-- gọi `BillEntityId.New()`.
+- gọi `TungEntityId.New()`.
 - tạo `PlayerDefinition`, `PlayerState`, `PlayerApplication`, `PlayerPresenter`, `PlayerRuntime`.
 - instantiate `PlayerView` bằng `Object.Instantiate` vì `PlayerView` hiện không có `[Inject]`.
 
@@ -566,10 +562,10 @@ Player death flow:
 ```text
 Combat/Application gọi PlayerApplication.ReceiveDamage()
   -> clamp damage âm về 0
-  -> nếu chết: PlayerApplication.OnDied(BillEntityId, RewardBundle)
+  -> nếu chết: PlayerApplication.OnDied(TungEntityId, RewardBundle)
     -> PlayerPresenter.HandleDied()
       -> lấy PlayerView.WorldPosition
-      -> OnDiedCallback(BillEntityId, RewardBundle, Vector2)
+      -> OnDiedCallback(TungEntityId, RewardBundle, Vector2)
         -> SceneController.HandlePlayerDied()
 ```
 
@@ -580,7 +576,7 @@ Combat/Application gọi PlayerApplication.ReceiveDamage()
 Asmdef:
 
 ```text
-BillGameCore.Modules.Inventory
+Tung.Modules.Inventory
 refs: Core, SharedPorts, VContainer
 ```
 
@@ -619,7 +615,7 @@ Current behavior:
 Asmdef:
 
 ```text
-BillGameCore.Modules.InteractionGroup
+Tung.Modules.InteractionGroup
 refs: Core, SharedPorts, VContainer
 ```
 
@@ -673,7 +669,7 @@ Rules:
 Asmdef:
 
 ```text
-BillGameCore.Modules.Enemy
+Tung.Modules.Enemy
 refs: Core, SharedPorts, VContainer
 ```
 
@@ -744,7 +740,7 @@ Modules/Enemy/Presentation/EnemyRuntime.cs
 
 `EnemySpawner`:
 - có đúng 1 public constructor để VContainer resolve rõ ràng.
-- gọi `BillEntityId.New()`.
+- gọi `TungEntityId.New()`.
 - tạo `EnemyDefinition`, `EnemyState`, `EnemyApplication`, `EnemyPresenter`, `EnemyRuntime`.
 - instantiate `EnemyView` bằng `Object.Instantiate` vì `EnemyView` hiện không có `[Inject]`.
 - hiện vẫn tồn tại trong module nhưng chưa nằm trên startup path của `00_Bootstrap`.
@@ -755,7 +751,7 @@ Modules/Enemy/Presentation/EnemyRuntime.cs
 - không register vào DI.
 
 Scene integration:
-- `Scenes.asmdef` reference `BillGameCore.Modules.Enemy`.
+- `Scenes.asmdef` reference `Tung.Modules.Enemy`.
 - `SceneBootstrapper` giao `EnemyRuntimeFactory` cho `SceneController.InitializeEnemyBinders(...)`.
 - `SceneController.InitializeEnemyBinders(...)` set callback và init runtime cho từng `EnemyBinder` scene-placed.
 - `EnemySpawner`/wave/spawn point contract vẫn deferred cho slice sau.
@@ -768,7 +764,7 @@ EnemyApplication.ReceiveDamage()
   -> OnDied(RewardBundle, ItemStack)
     -> EnemyPresenter forward reward + item drop
     -> EnemyBinder lấy EnemyView.WorldPosition
-    -> DiedCallback(BillEntityId, RewardBundle, ItemStack, Vector2)
+    -> DiedCallback(TungEntityId, RewardBundle, ItemStack, Vector2)
       -> SceneController.HandleEnemyDied()
         -> spawn reward loot nếu có RewardBundle
         -> spawn item loot nếu có ItemStack
@@ -930,7 +926,7 @@ Consumer uses IInventoryWriteService
 EnemyApplication.ReceiveDamage()
   -> nếu chết: DiedCallback(RewardBundle, ItemStack)
 EnemyBinder
-  -> DiedCallback(BillEntityId, RewardBundle, ItemStack, Vector2)
+  -> DiedCallback(TungEntityId, RewardBundle, ItemStack, Vector2)
 SceneController.HandleEnemyDied(...)
   -> spawn reward loot nếu có
   -> spawn item loot nếu có
@@ -945,7 +941,7 @@ SceneController.HandleLootCollected(...)
 
 ```text
 PlayerApplication.ReceiveDamage()
-  -> nếu chết: DiedCallback(BillEntityId, RewardBundle)
+  -> nếu chết: DiedCallback(TungEntityId, RewardBundle)
 PlayerPresenter.HandleDied()
   -> PlayerView.SetDeadState()
   -> SceneController.HandlePlayerDied(...)
@@ -991,7 +987,7 @@ InventoryHudView
 | R15 | Domain/Application không dùng UnityEngine. |
 | R16 | Chỉ InputReader được enqueue command. |
 | R17 | Prefab có `[Inject]` phải instantiate qua `container.Instantiate()`. |
-| R18 | `BillEntityId.New()` CHỈ được gọi từ Spawner/Binder nơi tạo entity instance. |
+| R18 | `TungEntityId.New()` CHỈ được gọi từ Spawner/Binder nơi tạo entity instance. |
 | R19 | Player death và Enemy death là hai handler riêng trong SceneController. |
 | R20 | Active scene startup nằm trong Scenes, không nằm trong Composition. |
 | R21 | Input runtime không dùng `PlayerInput` component và không dùng Generate C# wrapper; `InputReader` phải đi qua `InputActionGateway`. |
@@ -1004,9 +1000,9 @@ Sau khi sửa script:
 
 1. Unity Editor refresh asmdef/csproj.
 2. Không còn compile error trong Console.
-3. `BillGameCore.Core` không có UnityEngine reference.
+3. `Tung.Core` không có UnityEngine reference.
 4. `PlayerApplication` không import UnityEngine.
-5. `ProjectLifetimeScope` build được với `BillGameCore.Modules.Inventory` reference.
+5. `ProjectLifetimeScope` build được với `Tung.Modules.Inventory` reference.
 6. `BootstrapSceneLifetimeScope` có đủ Inspector refs.
    - `ProjectScope` tồn tại và `SceneScope/BootstrapSceneLifetimeScope` trỏ parent scope đúng về `ProjectScope`.
    - Có đủ `WalletReadSource`, `InventoryReadSource`, `PlayerView prefab`, `PlayerConfig`, `LootBinder prefab`.
