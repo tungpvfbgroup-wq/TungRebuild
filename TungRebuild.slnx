@@ -70,6 +70,7 @@
   <Project Path="Unity.InputSystem.TestFramework.csproj" />
   <Project Path="Unity.ShaderGraph.Utilities.csproj" />
   <Project Path="Unity.VisualScripting.Shared.Editor.csproj" />
+  <Project Path="01_Core.csproj" />
   <Project Path="Unity.2D.Aseprite.Common.csproj" />
   <Project Path="Unity.SurfaceCache.Runtime.csproj" />
   <Project Path="Unity.InternalAPIEngineBridge.RenderPipelines.Core.Runtime.Shared.csproj" />
@@ -78,7 +79,9 @@
   <Project Path="Unity.InternalAPIEngineBridge.004.csproj" />
   <Project Path="Unity.InputSystem.DocCodeSamples.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.Shaders.csproj" />
+  <Project Path="05_Scenes.csproj" />
   <Project Path="Unity.InternalAPIEditorBridge.ShaderGraph.Editor.csproj" />
+  <Project Path="04_Composition.csproj" />
   <Project Path="Unity.VisualScripting.DocCodeExamples.csproj" />
   <Project Path="Unity.PlasticSCM.Editor.Entities.csproj" />
   <Project Path="Unity.Rendering.LightTransport.Editor.csproj" />

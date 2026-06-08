@@ -1,11 +1,12 @@
 {
     "name": "04_Composition",
-    "rootNamespace": "",
+    "rootNamespace": "Tung.Composition",
     "references": [
         "GUID:424c486ad2097ef43a62cd02baf84716",
         "GUID:7eca86ab5d1eb92459c13e568602cad6",
         "GUID:1b790191969e86c4ca644308264004ae",
-        "GUID:3f46ac05b53c00947af7c4b70369b17a"
+        "GUID:3f46ac05b53c00947af7c4b70369b17a",
+        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

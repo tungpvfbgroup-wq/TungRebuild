@@ -116,7 +116,7 @@ Assets/_Game/
 │   └── 00_Bootstrap.unity
 └── Scripts/
     ├── 01_Core/
-    │   ├── Tung.Core.asmdef
+    │   ├── 01_Core.asmdef
     │   ├── Combat/
     │   ├── Interaction/
     │   ├── Inventory/
@@ -125,7 +125,7 @@ Assets/_Game/
     │   └── ValueObjects/
     │
     ├── 02_SharedPorts/
-    │   ├── Tung.SharedPorts.asmdef
+    │   ├── 02_SharedPorts.asmdef
     │   ├── Combat/
     │   ├── Economy/
     │   ├── Input/
@@ -134,18 +134,18 @@ Assets/_Game/
     │   └── Player/
     │
     ├── 03_Modules/
-    │   ├── Input/
-    │   ├── Player/
-    │   ├── Inventory/
-    │   ├── InteractionGroup/
-    │   └── Enemy/
+    │   ├── Input/03_Modules.Input.asmdef
+    │   ├── Player/03_Modules.Player.asmdef
+    │   ├── Inventory/03_Modules.Inventory.asmdef
+    │   ├── InteractionGroup/03_Modules.InteractionGroup.asmdef
+    │   └── Enemy/03_Modules.Enemy.asmdef
     │
     ├── 04_Composition/
-    │   ├── Tung.Composition.asmdef
+    │   ├── 04_Composition.asmdef
     │   └── ProjectLifetimeScope.cs
     │
     └── 05_Scenes/
-        ├── Tung.Scenes.asmdef
+        ├── 05_Scenes.asmdef
         ├── BootstrapSceneLifetimeScope.cs
         ├── WalletReadSource.cs
         ├── WalletHudView.cs
