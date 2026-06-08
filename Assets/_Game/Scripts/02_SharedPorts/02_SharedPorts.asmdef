@@ -1,0 +1,16 @@
+{
+    "name": "02_SharedPorts",
+    "rootNamespace": "",
+    "references": [
+        "GUID:424c486ad2097ef43a62cd02baf84716"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
