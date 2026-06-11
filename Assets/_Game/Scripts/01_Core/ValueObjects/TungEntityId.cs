@@ -1,19 +1,18 @@
-
 using System;
-
 namespace Tung.Core.ValueObjects
 {
-    public readonly struct TungEntityId : IEquatable<TungEntityId> // là một struct không thể thay đổi (immutable) và có thể so sánh với nhau
+    public readonly struct TungEntityId : IEquatable<TungEntityId>
     {
-        private readonly Guid _maDinhDanh; // một trường riêng tư kiểu Guid để lưu trữ giá trị của TungEntityId
-        private TungEntityId(Guid maDinhDanh) // một constructor riêng tư để khởi tạo giá trị của TungEntityId
-        {
-            _maDinhDanh = maDinhDanh;
-        }   
-
-        public bool Equals(TungEntityId other)
-        {
-            return _maDinhDanh == other._maDinhDanh; // so sánh giá trị của hai TungEntityId bằng cách so sánh trường _maDinhDanh của chúng
-        }
+        private readonly Guid _value;
+        private TungEntityId(Guid value) { _value = value; }
+        public static TungEntityId New() => new TungEntityId(Guid.NewGuid());
+        public static TungEntityId Invalid => default;
+        public bool IsValid => _value != Guid.Empty;
+        public bool Equals(TungEntityId other) => _value.Equals(other._value);
+        public override bool Equals(object obj) => obj is TungEntityId other && Equals(other);
+        public override int GetHashCode() => _value.GetHashCode();
+        public override string ToString() => IsValid ? _value.ToString("N")[..8] : "Invalid";
+        public static bool operator ==(TungEntityId left, TungEntityId right) => left.Equals(right);
+        public static bool operator !=(TungEntityId left, TungEntityId right) => !left.Equals(right);
     }
 }
