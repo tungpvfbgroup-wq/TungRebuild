@@ -1,4 +1,5 @@
 using Tung.Core.ValueObjects;
+
 namespace Tung.SharedPorts.Input
 {
     public interface ICommand

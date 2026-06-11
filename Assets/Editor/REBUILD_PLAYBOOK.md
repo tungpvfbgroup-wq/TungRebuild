@@ -236,6 +236,9 @@ Làm xong vertical slice nhỏ nhất nhưng chạm đủ kiến trúc:
 6. `IInputCommandSource.cs`
 7. `InputContext.cs`
 
+Ghi chú:
+- `IInputContextService.cs` chưa cần ở Slice 1. File này được thêm ở slice death/restart.
+
 #### Modules/Input
 
 1. `InputContextNames.cs`

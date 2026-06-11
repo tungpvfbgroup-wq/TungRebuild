@@ -1,7 +1,7 @@
 namespace Tung.SharedPorts.Input
 {
-    public interface IInputCommandSource 
+    public interface IInputCommandSource
     {
-        bool TryQueue(out ICommand command);
+        bool TryDequeue(out ICommand command);
     }
 }

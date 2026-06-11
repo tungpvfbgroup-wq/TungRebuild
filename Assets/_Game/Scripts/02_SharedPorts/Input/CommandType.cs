@@ -4,9 +4,8 @@ namespace Tung.SharedPorts.Input
     {
         None = 0,
         Move = 1,
-        Interact = 2,
-        Attack = 3,
+        Attack = 2,
+        Interact = 3,
         SwitchContext = 4
-
     }
 }

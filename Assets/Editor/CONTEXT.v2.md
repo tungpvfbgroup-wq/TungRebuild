@@ -212,7 +212,10 @@ SharedPorts/Input/IAttackCommand.cs
 SharedPorts/Input/IInteractCommand.cs
 SharedPorts/Input/IInputCommandSource.cs
 SharedPorts/Input/InputContext.cs
+SharedPorts/Input/IInputContextService.cs
 ```
+
+Trong rebuild order theo playbook, `IInputContextService` chưa cần materialize ở Slice 1; contract này được mở khi tới flow death/restart.
 
 Lý do: `PlayerPresenter` và các entity presenter chỉ cần biết narrow interfaces từ SharedPorts, không được cast sang concrete command type trong `Modules.Input.Commands`.
 
@@ -224,7 +227,9 @@ Quy tắc:
 - `CommandType` phải có `None = 0`, sau đó `Move = 1`, `Attack = 2`, `Interact = 3`, `SwitchContext = 4`. Không đánh số lại sau khi đã có replay/save.
 - `IMoveCommand` expose `DirX`, `DirY`, `IsMoving`.
 - `IAttackCommand` expose `IsHeld`, `HeldDuration`.
-- `IInputCommandSource` expose `TryDequeue(out ICommand command)` và `HasCommands`.
+- `IInputCommandSource` expose `TryDequeue(out ICommand command)`.
+- `InputContext` baseline hiện dùng `Player`, `UI`, `Vehicle`; không thêm `None` vào rebuild path hiện tại.
+- `IInputContextService` expose `SwitchContext(InputContext targetContext)` và `WasSubmitPressedThisFrame()`.
 
 ### Inventory contracts
 
