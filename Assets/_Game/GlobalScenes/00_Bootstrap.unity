@@ -357,6 +357,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1663230330}
+  - component: {fileID: 1663230331}
   m_Layer: 0
   m_Name: Input
   m_TagString: Untagged
@@ -379,6 +380,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1663230331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1663230329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2101bf15e0108b640b3f9fb7a8edcdd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 03_Input::Tung.Modules.Input.Infrastructure.InputReader
+  _action: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
 --- !u!1 &1929548974
 GameObject:
   m_ObjectHideFlags: 0
