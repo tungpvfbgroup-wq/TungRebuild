@@ -12,7 +12,7 @@ namespace Tung.Modules.Input.Infrastructure
     {
         [SerializeField] private InputActionAsset _action;
         private CommandBuffer _commandBuffer;
-        private TungEntityId _entityId;
+        private TungEntityId _controlledEntityId;
         private InputActionGateway _inputActionGateway;
         public void SetControlledEntityId(TungEntityId entityId)
         {
@@ -20,7 +20,7 @@ namespace Tung.Modules.Input.Infrastructure
             {
                 throw new InvalidOperationException("InputReader requires a valid controlled entityId");
             }
-            _entityId = entityId;
+            _controlledEntityId = entityId;
         }
         [Inject]
         public void Inject(CommandBuffer commandbuffer)
@@ -40,7 +40,7 @@ namespace Tung.Modules.Input.Infrastructure
         {
             _ = EnsureGateway();
         }
-        public void Awake()
+        private void Awake()
         {
             _inputActionGateway = EnsureGateway();
             _inputActionGateway.SetContext(InputContext.Player);
@@ -70,21 +70,21 @@ namespace Tung.Modules.Input.Infrastructure
             {
                 throw new InvalidOperationException("InputReader requires a CommandBuffer before update runs");
             }
-            if (!_entityId.IsValid)
+            if (!_controlledEntityId.IsValid)
             {
                 throw new InvalidOperationException("InputReader requires a Valid Controlled EntityId before update runs");
             }
             var moveInput = _inputActionGateway.ReadMove();
             var DirX = moveInput.x;
             var DirY = moveInput.y;
-            _commandBuffer.Enqueue(new MoveCommand(_entityId, DirX, DirY));
+            _commandBuffer.Enqueue(new MoveCommand(_controlledEntityId, DirX, DirY));
             if (_inputActionGateway.WasAttackPressedThisFrame())
             {
-                _commandBuffer.Enqueue(new AttackCommand(_entityId, false, 0f));
+                _commandBuffer.Enqueue(new AttackCommand(_controlledEntityId, false, 0f));
             }
             if (_inputActionGateway.WasInteractPressedThisFrame())
             {
-                _commandBuffer.Enqueue(new InteractCommand(_entityId));
+                _commandBuffer.Enqueue(new InteractCommand(_controlledEntityId));
             }
         }
         public void SwitchContext(InputContext targetContext)

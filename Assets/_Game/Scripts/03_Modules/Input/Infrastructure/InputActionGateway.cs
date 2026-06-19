@@ -39,13 +39,13 @@ namespace Tung.Modules.Input.Infrastructure
         }
         public void EnableCurrentContext()
         {
-            GetCurrentContext().Enable();
+            GetCurrentActionMap().Enable();
         }
         public void DisableCurrentContext()
         {
-            GetCurrentContext().Disable();
+            GetCurrentActionMap().Disable();
         }
-        public InputActionMap GetCurrentContext()
+        public InputActionMap GetCurrentActionMap()
         {
             if (CurrentContext == null)
             {
