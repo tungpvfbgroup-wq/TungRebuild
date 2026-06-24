@@ -21,12 +21,9 @@ namespace Tung.Modules.Input.Infrastructure
                 throw new InvalidOperationException("InputReader requires a valid controlled entityId");
             }
             _controlledEntityId = entityId;
+            Debug.Log($"[InputReader] {gameObject.name} has successfully connected to Entity ID: {entityId}. Starting key reading!");
         }
-        [Inject]
-        public void Inject(CommandBuffer commandbuffer)
-        {
-            _commandBuffer = commandbuffer ?? throw new ArgumentNullException(nameof(commandbuffer));
-        }
+
         private InputActionGateway EnsureGateway()
         {
             if (_action == null)
@@ -42,16 +39,41 @@ namespace Tung.Modules.Input.Infrastructure
         }
         private void Awake()
         {
+            if (_action == null)
+            {
+                Debug.Log($"[InputReader] missing InputActionAsset on {gameObject.name}", this);
+                enabled = false;
+                return;
+            }
+            if (_commandBuffer == null)
+            {
+                Debug.Log($"[InputReader] missing CommandBuffer on {gameObject.name}", this);
+                enabled = false;
+                return;
+            }
             _inputActionGateway = EnsureGateway();
             _inputActionGateway.SetContext(InputContext.Player);
+            Debug.LogWarning($"[InputReader] {gameObject.name} has finished initialization and is waiting to pass EntityId...", this);
         }
         private void OnEnable()
         {
-            _inputActionGateway.EnableCurrentContext();
+            if (_inputActionGateway != null)
+            {
+                _inputActionGateway.EnableCurrentContext();
+            }
+
         }
         private void OnDisable()
         {
-            _inputActionGateway.DisableCurrentContext();
+            if (_inputActionGateway != null)
+            {
+                _inputActionGateway.DisableCurrentContext();
+            }
+        }
+        [Inject]
+        public void Inject(CommandBuffer commandbuffer)
+        {
+            _commandBuffer = commandbuffer ?? throw new ArgumentNullException(nameof(commandbuffer));
         }
         private void Update()
         {
@@ -66,13 +88,9 @@ namespace Tung.Modules.Input.Infrastructure
         }
         private void ReadPlayerMap()
         {
-            if (_commandBuffer == null)
-            {
-                throw new InvalidOperationException("InputReader requires a CommandBuffer before update runs");
-            }
             if (!_controlledEntityId.IsValid)
             {
-                throw new InvalidOperationException("InputReader requires a Valid Controlled EntityId before update runs");
+                return;
             }
             var moveInput = _inputActionGateway.ReadMove();
             var DirX = moveInput.x;
@@ -112,5 +130,15 @@ namespace Tung.Modules.Input.Infrastructure
             }
             return gateway.WasSubmitPressedThisFrame();
         }
+        public void OnDestroy()
+        {
+            if (_inputActionGateway != null)
+            {
+                _inputActionGateway.Dispose();
+                _inputActionGateway = null;
+            }
+        }
+
+
     }
 }

@@ -1,12 +1,14 @@
 using System;
-using UnityEngine;
-using UnityEngine.InputSystem;
 using Tung.Modules.Input.Context;
 using Tung.SharedPorts.Input;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
 namespace Tung.Modules.Input.Infrastructure
 {
-    public sealed class InputActionGateway
+    public sealed class InputActionGateway : IDisposable
     {
+        private readonly InputActionAsset _runtimeActions;
         private readonly InputActionMap _playerActionMap;
         private readonly InputAction _moveAction;
         private readonly InputAction _attackAction;
@@ -14,17 +16,23 @@ namespace Tung.Modules.Input.Infrastructure
         private readonly InputActionMap _uiActionMap;
         private readonly InputAction _submitAction;
         public InputContext? CurrentContext { get; private set; }
+        private bool _disposed;
         public InputActionGateway(InputActionAsset action)
         {
-            if (action == null)
+            if (action = null)
             {
-                throw new("InputActionGateway requires an InputActionAsset.");
+                throw new InvalidOperationException("InputActionGateway requires an active InputActionAsset");
             }
-            _playerActionMap = action.FindActionMap(InputContextNames.Maps.Player, throwIfNotFound: true);
+#if UNITY_EDITOR
+            _runtimeActions = action;
+#else
+            _runtimeActions = UnityEngine.Object.Instantiate(action);
+#endif
+            _playerActionMap = _runtimeActions.FindActionMap(InputContextNames.Maps.Player, throwIfNotFound: true);
             _moveAction = _playerActionMap.FindAction(InputContextNames.PlayerActions.Move, throwIfNotFound: true);
             _attackAction = _playerActionMap.FindAction(InputContextNames.PlayerActions.Attack, throwIfNotFound: true);
             _interactAction = _playerActionMap.FindAction(InputContextNames.PlayerActions.Interact, throwIfNotFound: true);
-            _uiActionMap = action.FindActionMap(InputContextNames.Maps.UI, throwIfNotFound: true);
+            _uiActionMap = _runtimeActions.FindActionMap(InputContextNames.Maps.UI, throwIfNotFound: true);
             _submitAction = _uiActionMap.FindAction(InputContextNames.UiActions.Submit, throwIfNotFound: true);
         }
         public void SetContext(InputContext context)
@@ -34,7 +42,7 @@ namespace Tung.Modules.Input.Infrastructure
                 case InputContext.Player: CurrentContext = InputContext.Player; return;
                 case InputContext.UI: CurrentContext = InputContext.UI; return;
                 case InputContext.Vehicle:
-                default: throw new InvalidOperationException($"InputActionGateway does not support {context} ");
+                default: throw new InvalidOperationException($"InputActionGateway does not support {context}");
             }
         }
         public void EnableCurrentContext()
@@ -45,25 +53,25 @@ namespace Tung.Modules.Input.Infrastructure
         {
             GetCurrentActionMap().Disable();
         }
-        public InputActionMap GetCurrentActionMap()
+        private InputActionMap GetCurrentActionMap()
         {
             if (CurrentContext == null)
             {
-                throw new InvalidOperationException("InputActionGateway requires an active InputContext");
+                throw new InvalidOperationException($"InputActionGateway requires CurrentContext");
             }
             return CurrentContext switch
             {
                 InputContext.Player => _playerActionMap,
                 InputContext.UI => _uiActionMap,
-                InputContext.Vehicle => throw new InvalidOperationException($"do not support {CurrentContext}"),
-                _ => throw new InvalidOperationException($"do not support {CurrentContext}")
+                InputContext.Vehicle => throw new InvalidOperationException($"InputActionGateway does not support {CurrentContext}"),
+                _ => throw new InvalidOperationException($"InputActionGateway does not support {CurrentContext}")
             };
         }
         public void EnsurePlayerContext()
         {
             if (CurrentContext != InputContext.Player)
             {
-                throw new InvalidOperationException($"InputActionGateway requires an PlayerContext, but CurrentContext is {CurrentContext}");
+                throw new InvalidOperationException($"InputActionGateway requires Player Context but CurrentContext is {CurrentContext}");
             }
         }
         public Vector2 ReadMove()
@@ -76,6 +84,11 @@ namespace Tung.Modules.Input.Infrastructure
             EnsurePlayerContext();
             return _attackAction.WasPressedThisFrame();
         }
+        public bool WasAttackHeld()
+        {
+            EnsurePlayerContext();
+            return _attackAction.IsPressed();
+        }
         public bool WasInteractPressedThisFrame()
         {
             EnsurePlayerContext();
@@ -85,13 +98,35 @@ namespace Tung.Modules.Input.Infrastructure
         {
             if (CurrentContext != InputContext.UI)
             {
-                throw new InvalidOperationException($"InputActionGateway requires an UIContext, but CurrentContext is {CurrentContext}");
+                throw new InvalidOperationException($"InputActionGateway requires UI Context but CurrentContext is {CurrentContext}");
             }
         }
         public bool WasSubmitPressedThisFrame()
         {
             EnsureUiContext();
             return _submitAction.WasPressedThisFrame();
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+            DisableCurrentContextSafely();
+#if !UNITY_EDITOR
+            UnityEngine.Object.Destroy(_runtimeActions);
+#endif
+            CurrentContext = null;
+            _disposed = true;
+        }
+        public void DisableCurrentContextSafely()
+        {
+            if (CurrentContext == null)
+            {
+                return;
+            }
+            GetCurrentActionMap().Disable();
         }
     }
 }
