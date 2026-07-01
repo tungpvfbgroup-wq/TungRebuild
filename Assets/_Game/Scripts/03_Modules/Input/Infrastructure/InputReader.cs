@@ -47,7 +47,7 @@ namespace Tung.Modules.Input.Infrastructure
             }
             if (_commandBuffer == null)
             {
-                Debug.Log($"[InputReader] missing CommandBuffer on {gameObject.name}", this);
+                Debug.LogError($"[InputReader] missing CommandBuffer on {gameObject.name}", this);
                 enabled = false;
                 return;
             }

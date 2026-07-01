@@ -1,8 +1,8 @@
 ﻿<Solution>
   <Project Path="02_SharedPorts.csproj" />
   <Project Path="03_Input.csproj" />
-  <Project Path="01_Core.csproj" />
   <Project Path="03_Player.csproj" />
+  <Project Path="01_Core.csproj" />
   <Project Path="05_Scenes.csproj" />
   <Project Path="04_Composition.csproj" />
 </Solution>

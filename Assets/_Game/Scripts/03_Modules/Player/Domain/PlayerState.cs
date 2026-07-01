@@ -1,5 +1,5 @@
 using System;
-
+using UnityEngine.Assemblies;
 namespace Tung.Modules.Player.Domain
 {
     public sealed class PlayerState
@@ -8,16 +8,18 @@ namespace Tung.Modules.Player.Domain
         public float CurrentHealth { get; private set; }
         public float MoveVelocityX { get; private set; }
         public float MoveVelocityY { get; private set; }
+        public float NextAttackTime { get; private set; }
         public bool IsDead => CurrentHealth <= 0f;
         public bool IsMoving => !IsDead && (MoveVelocityX * MoveVelocityX) + (MoveVelocityY * MoveVelocityY) > 0f;
-        public PlayerState(float initialMaxHealth)
+        public PlayerState(PlayerDefinition definition)
         {
-            if (initialMaxHealth <= 0f)
+            if (definition.MaxHealth <= 0f)
             {
-                throw new ArgumentOutOfRangeException(nameof(initialMaxHealth));
+                throw new ArgumentOutOfRangeException(nameof(definition));
             }
-            MaxHealth = initialMaxHealth;
-            CurrentHealth = initialMaxHealth;
+            MaxHealth = definition.MaxHealth;
+            CurrentHealth = definition.MaxHealth;
+            NextAttackTime = 0f;
         }
         public void SetMoveVelocity(float velocityX, float velocityY)
         {
@@ -40,14 +42,13 @@ namespace Tung.Modules.Player.Domain
                 MoveVelocityY = 0f;
             }
         }
-        public void Revive(float healthAfterRevive)
+        public void SetNextAttackTime(float nextAttackTime)
         {
-            if (!IsDead) return;
-            if (healthAfterRevive <= 0f || healthAfterRevive > MaxHealth)
+            if (nextAttackTime < 0f)
             {
-                throw new ArgumentOutOfRangeException(nameof(healthAfterRevive));
+                throw new ArgumentOutOfRangeException(nameof(nextAttackTime));
             }
-            CurrentHealth = healthAfterRevive;
+            NextAttackTime = nextAttackTime;
         }
 
     }
