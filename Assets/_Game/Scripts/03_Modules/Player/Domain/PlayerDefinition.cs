@@ -1,4 +1,5 @@
 using System;
+using Tung.Core.Combat;
 
 namespace Tung.Modules.Player.Domain
 {
@@ -6,9 +7,8 @@ namespace Tung.Modules.Player.Domain
     {
         public float MaxHealth { get; }
         public float MoveSpeed { get; }
-        public float AttackDamage { get; }
-        public float AttackCooldown { get; }
-        public PlayerDefinition(float maxHealth, float moveSpeed, float attackDamage, float attackCooldown)
+        public WeaponDefinition StartWeapon { get; }
+        public PlayerDefinition(float maxHealth, float moveSpeed, WeaponDefinition startWeapon)
         {
             if (maxHealth <= 0f)
             {
@@ -17,20 +17,14 @@ namespace Tung.Modules.Player.Domain
             if (moveSpeed <= 0f)
             {
                 throw new ArgumentOutOfRangeException(nameof(moveSpeed), "PlayerDefinition requires moveSpeed > 0");
-
             }
-            if (attackDamage < 0f)
+            if (startWeapon.MaxDurability <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(attackDamage), "PlayerDefinition requires attackDamage >= 0");
-            }
-            if (attackCooldown < 0f)
-            {
-                throw new ArgumentOutOfRangeException(nameof(attackCooldown), "PlayerDefinition requires attackCooldown >= 0");
+                throw new ArgumentOutOfRangeException(nameof(startWeapon), "PlayerDefinition requires a valid WeaponDefinition");
             }
             MaxHealth = maxHealth;
             MoveSpeed = moveSpeed;
-            AttackDamage = attackDamage;
-            AttackCooldown = attackCooldown;
+            StartWeapon = startWeapon;
         }
     }
 }

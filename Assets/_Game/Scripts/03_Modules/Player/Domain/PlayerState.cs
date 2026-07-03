@@ -1,5 +1,5 @@
 using System;
-using UnityEngine.Assemblies;
+using Tung.Core.Combat;
 namespace Tung.Modules.Player.Domain
 {
     public sealed class PlayerState
@@ -9,17 +9,24 @@ namespace Tung.Modules.Player.Domain
         public float MoveVelocityX { get; private set; }
         public float MoveVelocityY { get; private set; }
         public float NextAttackTime { get; private set; }
+        public WeaponDefinition CurrentWeapon { get; private set; }
+        public int MaxWeaponDurability => CurrentWeapon.MaxDurability;
+        public int CurrentWeaponDurability { get; private set; }
         public bool IsDead => CurrentHealth <= 0f;
         public bool IsMoving => !IsDead && (MoveVelocityX * MoveVelocityX) + (MoveVelocityY * MoveVelocityY) > 0f;
         public PlayerState(PlayerDefinition definition)
         {
-            if (definition.MaxHealth <= 0f)
+            if (definition == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(definition));
+                throw new ArgumentNullException(nameof(definition));
             }
             MaxHealth = definition.MaxHealth;
             CurrentHealth = definition.MaxHealth;
             NextAttackTime = 0f;
+            CurrentWeapon = definition.StartWeapon;
+
+            CurrentWeaponDurability = CurrentWeapon.MaxDurability;
+
         }
         public void SetMoveVelocity(float velocityX, float velocityY)
         {

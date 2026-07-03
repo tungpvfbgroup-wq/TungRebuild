@@ -11,6 +11,7 @@ namespace Tung.Modules.Player.Application
         private readonly PlayerState _state;
         private readonly PlayerDefinition _definition;
         public bool IsDead => _state.IsDead;
+        public WeaponDefinition CurrentWeapon => _state.CurrentWeapon;
         public event Action<TungEntityId, RewardBundle> Die;
         public PlayerApplication(TungEntityId entityId, PlayerState state, PlayerDefinition definition)
         {
@@ -24,6 +25,13 @@ namespace Tung.Modules.Player.Application
         }
         public void ComputeMoveVelocity(float inputX, float inputY, out float velocityX, out float velocityY)
         {
+            if (IsDead)
+            {
+                velocityX = 0f;
+                velocityY = 0f;
+                _state.SetMoveVelocity(velocityX, velocityY);
+                return;
+            }
             var magnitudeSquared = (inputX * inputX) + (inputY * inputY);
             if (magnitudeSquared > 1f)
             {
@@ -35,26 +43,31 @@ namespace Tung.Modules.Player.Application
             velocityY = inputY * _definition.MoveSpeed;
             _state.SetMoveVelocity(velocityX, velocityY);
         }
-        public DamageResult Attack(IDamageReceiver target, float currentTime)
-        {
-            if (target == null)
-            {
-                throw new ArgumentNullException(nameof(target));
-            }
-            if (_state.IsDead || currentTime < _state.NextAttackTime || _definition.AttackDamage <= 0f)
-            {
-                return new DamageResult(0f, _state.CurrentHealth, false);
-            }
-            var damageInfo = new DamageInfo(_entityId, _definition.AttackDamage);
-            var result = target.ReceiveDamage(damageInfo);
-            _state.SetNextAttackTime(_definition.AttackCooldown + currentTime);
-            return result;
-        }
         public PlayerReadModel GetReadModel()
         {
             return new PlayerReadModel(_state.MaxHealth, _state.CurrentHealth, _state.MoveVelocityX,
-            _state.MoveVelocityY, _state.IsMoving, _state.IsDead);
+            _state.MoveVelocityY, _state.MaxWeaponDurability, _state.CurrentWeaponDurability,
+            _state.IsMoving, _state.IsDead);
         }
+        public AttackStartResult TryStartAttack(float currentTime)
+        {
+            if (_state.IsDead)
+            {
+                return AttackStartResult.CreateBlocked(AttackBlockReason.Dead);
+            }
+            if (currentTime < _state.NextAttackTime)
+            {
+                return AttackStartResult.CreateBlocked(AttackBlockReason.Cooldown);
+            }
+            if (_state.CurrentWeaponDurability <= 0)
+            {
+                return AttackStartResult.CreateBlocked(AttackBlockReason.BrokenWeapon);
+            }
+            var attack = _state.CurrentWeapon.Attack;
+            _state.SetNextAttackTime(currentTime + attack.Cooldown);
+            return AttackStartResult.CreateStarted(new AttackRequest(_entityId, attack, currentTime));
+        }
+
 
         public DamageResult ReceiveDamage(DamageInfo damageInfo)
         {
