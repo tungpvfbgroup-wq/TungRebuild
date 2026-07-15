@@ -15,8 +15,7 @@ namespace Tung.Modules.Player.Infrastructure.Config
         [field: SerializeField, Min(0f)] public float Range { get; private set; } = 0.2f;
         [field: SerializeField, Min(0f)] public float HitDelay { get; private set; } = 0.2f;
         [field: SerializeField, Min(1)] public int MaxTargetCount { get; private set; } = 1;
-        [field: SerializeField, Range(0, 180)] public int ConeAngleDegrees { get; private set; } = 90;
-        [field: SerializeField] public AttackHitShape HitShape { get; private set; } = AttackHitShape.Cone;
+        [field: SerializeField, Range(1, 180)] public int ConeAngleDegrees { get; private set; } = 90;
         public PlayerDefinition ToDefinition()
         {
             return new PlayerDefinition(
@@ -24,7 +23,7 @@ namespace Tung.Modules.Player.Infrastructure.Config
                 new WeaponDefinition(
                     MaxDurability,
                     new AttackDefinition(Damage, Cooldown, Range, HitDelay, MaxTargetCount,
-                    ConeAngleDegrees, HitShape)));
+                    ConeAngleDegrees)));
         }
     }
 

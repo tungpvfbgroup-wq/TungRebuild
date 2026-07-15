@@ -25,7 +25,7 @@ namespace Tung.Modules.Player.Application
         }
         public void ComputeMoveVelocity(float inputX, float inputY, out float velocityX, out float velocityY)
         {
-            if (IsDead)
+            if (_state.IsDead)
             {
                 velocityX = 0f;
                 velocityY = 0f;
@@ -49,6 +49,10 @@ namespace Tung.Modules.Player.Application
             _state.MoveVelocityY, _state.MaxWeaponDurability, _state.CurrentWeaponDurability,
             _state.IsMoving, _state.IsDead);
         }
+        public void ConsumeWeaponDurability(int amount)
+        {
+            _state.ConsumeWeaponDurability(amount);
+        }
         public AttackStartResult TryStartAttack(float currentTime)
         {
             if (_state.IsDead)
@@ -67,8 +71,6 @@ namespace Tung.Modules.Player.Application
             _state.SetNextAttackTime(currentTime + attack.Cooldown);
             return AttackStartResult.CreateStarted(new AttackRequest(_entityId, attack, currentTime));
         }
-
-
         public DamageResult ReceiveDamage(DamageInfo damageInfo)
         {
             if (_state.IsDead)

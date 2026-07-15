@@ -57,6 +57,14 @@ namespace Tung.Modules.Player.Domain
             }
             NextAttackTime = nextAttackTime;
         }
+        public void ConsumeWeaponDurability(int amount)
+        {
+            if (amount <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(amount));
+            }
+            CurrentWeaponDurability = Math.Clamp(CurrentWeaponDurability - amount, 0, MaxWeaponDurability);
+        }
 
     }
 }
